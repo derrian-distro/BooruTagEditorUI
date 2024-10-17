@@ -17,4 +17,5 @@ type ImageWithTags = {
   saveMode: 'json' | 'txt' | 'caption'
   wordSep: '_' | ' '
   tagSep: ',' | ' ' | null
+  isSelected?: boolean
 }

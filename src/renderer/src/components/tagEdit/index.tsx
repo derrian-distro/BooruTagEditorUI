@@ -48,6 +48,7 @@ function TagEdit() {
     if (currentImage) {
       window.api.saveTags({ ...currentImage, tags: selectedTags.map((v) => v.tag) })
     }
+    image.isSelected = true
     const newImageTags = image.tags
     const newTags: Tag[] = []
     for (const tag of newImageTags) {

@@ -1,10 +1,11 @@
-import { FolderOpenIcon } from 'lucide-react'
+import { ChevronLeftIcon, ChevronRightIcon, FolderOpenIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { useSignal, useSlot } from 'react-signal-slot'
+import { useSlot } from 'react-signal-slot'
+import useSignalRef from '../hooks/useSignalRef'
 import { Button } from '../ui/button'
 
 function MainImage() {
-  const signal = useSignal()
+  const signal = useSignalRef()
   const [image, setImage] = useState<ImageWithTags | null>(null)
   const [dimensions, setDimensions] = useState<{ width: number; height: number }>({
     width: 0,
@@ -14,8 +15,27 @@ function MainImage() {
 
   useSlot('imageChanged', (image: ImageWithTags) => {
     setImage(image)
-    signal('newImageSelected', image)
+    signal.current('newImageSelected', image)
   })
+
+  useSlot('changeImageArrow', (left: boolean) => {
+    signal.current('incDecImage', image, left)
+  })
+
+  const handleLeftRight = (e: KeyboardEvent) => {
+    console.log(e.key)
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault()
+      signal.current('changeImageArrow', true)
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault()
+      signal.current('changeImageArrow', false)
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleLeftRight)
+  }, [])
 
   useEffect(() => {
     const updateDimensions = (entries: { contentRect: { width: number; height: number } }[]) => {
@@ -47,17 +67,25 @@ function MainImage() {
           onClick={async () => {
             const images = await window.api.getImages()
             setImage(images[0])
-            signal('newImageSelected', images[0])
-            signal('changeImageList', images)
+            signal.current('newImageSelected', images[0])
+            signal.current('changeImageList', images)
           }}
-          className="absolute opacity-50 hover:opacity-100"
-          style={{
-            top: 0,
-            margin: '0 auto'
-          }}
+          className="absolute top-0 mx-auto opacity-70 hover:opacity-100"
         >
           <FolderOpenIcon width="100%" height="100%" />
           <div className="pl-1">Open Folder</div>
+        </Button>
+        <Button
+          className="absolute left-0 w-12 h-24 my-auto opacity-70 hover:opacity-100"
+          onClick={() => signal.current('incDecImage', image, true)}
+        >
+          <ChevronLeftIcon transform="scale(2.5)" />
+        </Button>
+        <Button
+          className="absolute right-0 w-12 h-24 my-auto opacity-70 hover:opacity-100"
+          onClick={() => signal.current('incDecImage', image, false)}
+        >
+          <ChevronRightIcon transform="scale(2.5)" />
         </Button>
         <img
           src={'atom://' + image.imagePath}
@@ -76,8 +104,8 @@ function MainImage() {
       onClick={async () => {
         const images = await window.api.getImages()
         setImage(images[0])
-        signal('newImageSelected', images[0])
-        signal('changeImageList', images)
+        signal.current('newImageSelected', images[0])
+        signal.current('changeImageList', images)
       }}
     >
       <FolderOpenIcon width="100%" height="100%" />

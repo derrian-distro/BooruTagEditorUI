@@ -17,12 +17,33 @@ function Gallery() {
       if (foundIndex === -1) {
         return
       }
+      updatedImage.isSelected = false
+      value.isSelected = true
       const tempImageList = [...imageList]
       tempImageList[foundIndex] = updatedImage
       setImageList(tempImageList)
       signal('imageChanged', value)
     }
   )
+
+  useSlot('incDecImage', (image: ImageWithTags, left: boolean) => {
+    let foundIndex = imageList.findIndex((v) => v.imagePath === image.imagePath)
+    if (foundIndex === undefined) {
+      return
+    }
+    if (left) {
+      if (foundIndex - 1 < 0) {
+        return
+      }
+      foundIndex--
+    } else {
+      if (foundIndex + 1 >= imageList.length) {
+        return
+      }
+      foundIndex++
+    }
+    signal('updateImageTags', imageList[foundIndex])
+  })
 
   return (
     <div className="flex w-full h-full">

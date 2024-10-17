@@ -96,7 +96,8 @@ function OptimizedGrid({ items, maxItemHeight }: OptimizedGridProps) {
           className="object-contain max-h-full border max-w-48 border-slate-600 hover:bg-[#05112e] cursor-pointer"
           style={{
             width: `${dimensions.width}px`,
-            height: `${dimensions.height}px`
+            height: `${dimensions.height}px`,
+            backgroundColor: value.isSelected ? '#0b235b' : undefined
           }}
           onClick={() => {
             signal('updateImageTags', value)
