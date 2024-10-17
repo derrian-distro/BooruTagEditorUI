@@ -1,7 +1,7 @@
 {
-  "name": "electron-app",
+  "name": "BooruTagEditorUI",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "Booru Tag Editor UI is a desktop application built with Electron, React, and Shadcn/UI. It allows users to load image/text pairs of booru-style tags and edit tags for each image individually",
   "main": "./out/main/index.js",
   "author": "example.com",
   "homepage": "https://electron-vite.org",

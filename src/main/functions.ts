@@ -8,7 +8,6 @@ import {
   writeFileSync,
   writeJsonSync
 } from 'fs-extra'
-import path from 'path'
 import { validateMIMEType } from 'validate-image-type'
 import tags from '../../tag_groups.json'
 
@@ -103,6 +102,7 @@ export async function getImages() {
       img.push(`${path}${process.platform === 'win32' ? '\\' : '/'}${name}`)
     }
   }
+
   const ImageList: ImageWithTags[] = []
   for (const image of img) {
     const result = await validateMIMEType(image, {
@@ -112,15 +112,26 @@ export async function getImages() {
       console.log(result.error)
       continue
     }
-    const imageRegex = new RegExp(`${image.split('.')[0]}`.replaceAll('\\', '\\\\'))
-    const caption = tags.find((val) => imageRegex.test(val))
+
+    let caption: undefined | string = undefined
+    for (const type of ['.json', '.txt', '.caption']) {
+      const temp = tags.find((val) => val === image.split('.')[0] + type)
+      if (temp) {
+        caption = temp
+        break
+      }
+    }
+
+    if (caption === undefined) {
+      continue
+    }
 
     if (caption?.endsWith('txt') || caption?.endsWith('caption')) {
       let data: string | string[] = await readFile(caption, {
         encoding: 'utf-8'
       })
-      const wordSep = data.includes('_') ? '_' : ' '
       const tagSep = data.includes(',') ? ',' : ' '
+      const wordSep = data.split(tagSep).some((value) => value.includes(' ')) ? ' ' : '_'
 
       if (tagSep === ',') {
         data = data.replaceAll(', ', ',').split(',')
@@ -152,7 +163,7 @@ export async function getImages() {
         }
       }
       ImageList.push({
-        imagePath: path.join(filePaths[0], image),
+        imagePath: image,
         tags: data,
         saveMode: 'json',
         wordSep: wordSep,

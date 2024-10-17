@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: electron-app
+appId: com.BooruTagEditorUI.app
+productName: BooruTagEditorUI
 directories:
   buildResources: build
 files:
